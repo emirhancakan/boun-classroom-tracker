@@ -1,0 +1,604 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Boğaziçi University Room Schedule Viewer</title>
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+
+    <!-- Google Fonts - Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+
+<body>
+    <!-- Header -->
+    <div class="hero-section">
+        <div class="container-fluid">
+            <div class="text-center">
+                <h1 class="display-4">📅 Boğaziçi Room Schedule Viewer</h1>
+                <p class="lead">Final Refinement - Data Integrity & Grid Rendering</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="container-fluid px-4 pb-5">
+
+        <!-- Semester Selection -->
+        <div class="row mb-4">
+            <div class="col-md-6 mx-auto">
+                <div class="card">
+                    <div class="card-body">
+                        <label for="semesterSelect" class="form-label">
+                            <i class="bi bi-calendar3"></i> Select Semester
+                        </label>
+                        <select id="semesterSelect" class="form-select form-select-lg">
+                            <option value="">Loading...</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Building Selection -->
+        <div class="mb-4">
+            <h2 class="h4 mb-3"><i class="bi bi-building"></i> Select Building</h2>
+            <div id="buildingSelector" class="row row-cols-1 row-cols-md-2 row-cols-lg-4 g-3">
+                <!-- Building cards will be inserted here -->
+            </div>
+        </div>
+
+        <!-- Room Selection (Hidden by default) -->
+        <div id="roomSelectorContainer" class="mb-4 d-none">
+            <div class="card">
+                <div class="card-body">
+                    <label for="roomSelect" class="form-label">
+                        <i class="bi bi-door-closed"></i> Select Room
+                    </label>
+                    <select id="roomSelect" class="form-select form-select-lg">
+                        <option value="">Select a room...</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <!-- Weekly Schedule Grid (Hidden by default) -->
+        <div id="scheduleGridContainer" class="mb-4 d-none">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h3 class="h5 mb-0" id="gridHeader">Weekly Schedule</h3>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="schedule-grid">
+                            <thead>
+                                <tr>
+                                    <th style="width: 100px;">Time</th>
+                                    <th>Monday</th>
+                                    <th>Tuesday</th>
+                                    <th>Wednesday</th>
+                                    <th>Thursday</th>
+                                    <th>Friday</th>
+                                </tr>
+                            </thead>
+                            <tbody id="scheduleGridBody">
+                                <!-- Schedule rows will be inserted here -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Course Search -->
+        <hr class="my-5">
+
+        <div class="mb-4">
+            <h2 class="h4 mb-3"><i class="bi bi-search"></i> Search Courses</h2>
+            <div class="card">
+                <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-md-8">
+                            <input type="text" id="courseSearch" class="form-control form-control-lg"
+                                placeholder="Enter course code (e.g., 'CE', 'CMPE')...">
+                            <small class="text-muted">Searches course codes only (strict matching)</small>
+                        </div>
+                        <div class="col-md-4">
+                            <button id="searchBtn" class="btn btn-primary btn-lg w-100">
+                                <i class="bi bi-search"></i> Search
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Search Results -->
+        <div id="courseResults"></div>
+
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Custom JavaScript -->
+    <script>
+        console.log('🚀 Final Refinement - App Started');
+
+        // Global state
+        let selectedBuilding = null;
+        let selectedRoom = null; // PHASE 5.1: For debugging grid rendering
+
+        // --- INITIALIZATION ---
+        document.addEventListener('DOMContentLoaded', async function () {
+            console.log('✅ DOM Loaded, initializing app...');
+
+            try {
+                await Promise.all([
+                    loadSemesters(),
+                    loadBuildings()
+                ]);
+
+                console.log('✅ Final Refinement - Initialization complete');
+
+            } catch (error) {
+                console.error('❌ Critical initialization error:', error);
+                alert('API Error: Check console. Make sure the server is running on port 5000.');
+            }
+
+            attachEventListeners();
+        });
+
+        // --- API FUNCTIONS ---
+
+        async function loadSemesters() {
+            console.log('📅 Fetching semesters...');
+            const select = document.getElementById('semesterSelect');
+
+            try {
+                const response = await fetch('/api/semesters');
+
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+
+                const data = await response.json();
+
+                if (!data.success) {
+                    throw new Error(data.error || 'Failed to load semesters');
+                }
+
+                select.innerHTML = '<option value="">Select semester</option>';
+
+                if (data.semesters && data.semesters.length > 0) {
+                    data.semesters.forEach(semester => {
+                        const option = document.createElement('option');
+                        option.value = semester;
+                        option.textContent = semester;
+                        select.appendChild(option);
+                    });
+
+                    select.value = data.semesters[0];
+                    console.log(`✅ Loaded ${data.semesters.length} semesters`);
+                } else {
+                    select.innerHTML = '<option value="">No semesters found</option>';
+                }
+
+            } catch (error) {
+                console.error('❌ Error loading semesters:', error);
+                select.innerHTML = '<option value="">⚠️ Connection Error</option>';
+                select.disabled = true;
+                throw error;
+            }
+        }
+
+        async function loadBuildings() {
+            console.log('🏢 Fetching buildings...');
+            const container = document.getElementById('buildingSelector');
+
+            try {
+                const response = await fetch('/api/buildings');
+
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+
+                const data = await response.json();
+
+                if (!data.success) {
+                    throw new Error(data.error || 'Failed to load buildings');
+                }
+
+                container.innerHTML = '';
+
+                if (data.buildings && data.buildings.length > 0) {
+                    data.buildings.forEach(building => {
+                        const col = document.createElement('div');
+                        col.className = 'col';
+
+                        const card = document.createElement('div');
+                        card.className = 'building-card card h-100 text-center';
+                        card.dataset.code = building.code;
+                        card.innerHTML = `
+                            <div class="card-body d-flex flex-column justify-content-center">
+                                <h5 class="card-title mb-0" style="font-size: 0.9rem;">${building.name}</h5>
+                            </div>
+                        `;
+
+                        card.addEventListener('click', function () {
+                            selectBuilding(building.code, card);
+                        });
+
+                        col.appendChild(card);
+                        container.appendChild(col);
+                    });
+
+                    console.log(`✅ Loaded ${data.buildings.length} buildings (definitive inventory)`);
+                } else {
+                    container.innerHTML = '<div class="col-12"><div class="alert alert-warning">No buildings found</div></div>';
+                }
+
+            } catch (error) {
+                console.error('❌ Error loading buildings:', error);
+                container.innerHTML = '<div class="col-12"><div class="alert alert-danger"><i class="bi bi-exclamation-triangle"></i> Failed to load buildings</div></div>';
+                throw error;
+            }
+        }
+
+        async function selectBuilding(code, cardElement) {
+            console.log(`👉 Building selected: ${code}`);
+
+            document.querySelectorAll('.building-card').forEach(card => {
+                card.classList.remove('active');
+            });
+            cardElement.classList.add('active');
+            selectedBuilding = code;
+
+            const roomContainer = document.getElementById('roomSelectorContainer');
+            const roomSelect = document.getElementById('roomSelect');
+            const gridContainer = document.getElementById('scheduleGridContainer');
+
+            roomContainer.classList.remove('d-none');
+            gridContainer.classList.add('d-none');
+
+            roomSelect.innerHTML = '<option value="">Loading rooms...</option>';
+            roomSelect.disabled = true;
+
+            try {
+                const response = await fetch(`/api/rooms/${code}`);
+
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+
+                const data = await response.json();
+
+                if (!data.success) {
+                    throw new Error(data.error || 'Failed to load rooms');
+                }
+
+                roomSelect.innerHTML = '<option value="">Select a room...</option>';
+
+                if (data.rooms && data.rooms.length > 0) {
+                    data.rooms.forEach(room => {
+                        const option = document.createElement('option');
+                        option.value = room;
+                        option.textContent = room;
+                        roomSelect.appendChild(option);
+                    });
+
+                    roomSelect.disabled = false;
+                    console.log(`✅ Loaded ${data.rooms.length} rooms for building ${code}`);
+                } else {
+                    roomSelect.innerHTML = '<option value="">No rooms found</option>';
+                }
+
+            } catch (error) {
+                console.error('❌ Error loading rooms:', error);
+                roomSelect.innerHTML = '<option value="">⚠️ Error loading rooms</option>';
+            }
+        }
+
+        async function loadRoomSchedule(room) {
+            console.log(`📅 Loading schedule for room: ${room}`);
+
+            // PHASE 5.1: Store selected room for debugging
+            selectedRoom = room;
+
+            const semester = document.getElementById('semesterSelect').value;
+
+            if (!semester) {
+                alert('Please select a semester first');
+                return;
+            }
+
+            const gridContainer = document.getElementById('scheduleGridContainer');
+            const gridBody = document.getElementById('scheduleGridBody');
+            const gridHeader = document.getElementById('gridHeader');
+
+            gridContainer.classList.remove('d-none');
+
+            // Update header
+            let headerHtml = `Weekly Schedule: ${room}`;
+            if (room.startsWith('VYKM')) {
+                headerHtml += ' <span class="badge bg-info">Mühendislik Binası - Perkins Hall</span>';
+            }
+            gridHeader.innerHTML = headerHtml;
+
+            gridBody.innerHTML = '<tr><td colspan="6" class="text-center py-5"><div class="spinner-border text-primary"></div></td></tr>';
+
+            try {
+                const response = await fetch('/api/schedule/room', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        semester: semester,
+                        room: room
+                    })
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+
+                const data = await response.json();
+
+                if (!data.success) {
+                    throw new Error(data.error || 'Failed to load schedule');
+                }
+
+                console.log(`✅ Loaded schedule with ${data.schedule.length} occupied slots for ${room}`);
+
+                if (data.schedule.length === 0) {
+                    console.warn(`⚠️ Room ${room} returned 0 slots. Check database.`);
+                }
+
+                renderScheduleGrid(data.schedule);
+
+            } catch (error) {
+                console.error('❌ Error loading schedule:', error);
+                gridBody.innerHTML = '<tr><td colspan="6" class="text-center text-danger py-4"><i class="bi bi-exclamation-circle"></i> Failed to load schedule</td></tr>';
+            }
+        }
+
+        function renderScheduleGrid(schedule) {
+            // ██████████████████████████████████████████████████████████████████████
+            // PHASE 5.2 - FINAL GRID REBUILD
+            // STRICT ARCHITECTURAL OVERWRITE
+            // ██████████████████████████████████████████████████████████████████████
+
+            console.log('PHASE 5.2 - TARGETING ROOM:', selectedRoom);
+            console.log('PHASE 5.2 - Received Data Entry Count:', schedule ? schedule.length : 0);
+
+            const gridBody = document.getElementById('scheduleGridBody');
+            if (!gridBody) {
+                alert('CRITICAL: #scheduleGridBody not found in DOM');
+                return;
+            }
+
+            // 1. FAIL-SAFE VISIBILITY
+            if (!schedule || schedule.length === 0) {
+                alert('BACKEND RETURNED ZERO DATA FOR THIS ROOM');
+                gridBody.innerHTML = '<tr><td colspan="6" class="text-center text-danger">NO DATA</td></tr>';
+                return;
+            }
+
+            // 2. CLEAR CONTENT
+            gridBody.innerHTML = '';
+
+            // 3. DAY MAP (Hardcoded Bridge)
+            const dayMap = {
+                'Monday': 'M',
+                'Tuesday': 'T',
+                'Wednesday': 'W',
+                'Thursday': 'Th',
+                'Friday': 'F'
+            };
+
+            const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
+
+            // 4. DOUBLE-LOOP BRUTE-FORCE
+            for (let slot = 1; slot <= 13; slot++) {
+                let rowHtml = '<tr>';
+
+                // Time Label ($Slot + 8:00)
+                const timeLabel = (slot + 8).toString().padStart(2, '0') + ':00';
+                rowHtml += `<td><strong>${timeLabel}</strong></td>`;
+
+                days.forEach(dayName => {
+                    const mappedDay = dayMap[dayName];
+
+                    // STRICT MATCHING
+                    const match = schedule.find(item =>
+                        String(item.time_slot) === String(slot) &&
+                        item.day === mappedDay
+                    );
+
+                    if (match) {
+                        // Deep Log Requirement
+                        console.log('✅ MATCH:', dayName, slot, match.course_code);
+
+                        // Occupied Cell
+                        rowHtml += `<td class="slot-occupied">${match.course_code}</td>`;
+                    } else {
+                        // Empty Cell
+                        rowHtml += `<td></td>`;
+                    }
+                });
+
+                rowHtml += '</tr>';
+                gridBody.innerHTML += rowHtml;
+            }
+        }
+
+        // PHASE 5.1: Store current room for debugging
+        let currentRoom = '';
+
+        async function searchCourse() {
+            console.log('🔍 Searching courses...');
+
+            const semester = document.getElementById('semesterSelect').value;
+            const query = document.getElementById('courseSearch').value.trim();
+            const resultsDiv = document.getElementById('courseResults');
+
+            if (!semester) {
+                alert('Please select a semester first');
+                return;
+            }
+
+            if (!query) {
+                alert('Please enter a course code');
+                return;
+            }
+
+            resultsDiv.innerHTML = '<div class="text-center py-5"><div class="spinner-border text-primary"></div></div>';
+
+            try {
+                const response = await fetch('/api/search/course', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        semester: semester,
+                        query: query
+                    })
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+
+                const data = await response.json();
+
+                if (!data.success) {
+                    throw new Error(data.error || 'Search failed');
+                }
+
+                if (data.courses && data.courses.length > 0) {
+                    displayCourseResults(data.courses);
+                    console.log(`✅ Found ${data.courses.length} courses matching '${query}'`);
+                } else {
+                    resultsDiv.innerHTML = '<div class="alert alert-info"><i class="bi bi-info-circle"></i> No courses found matching that code</div>';
+                }
+
+            } catch (error) {
+                console.error('❌ Search error:', error);
+                resultsDiv.innerHTML = '<div class="alert alert-danger"><i class="bi bi-exclamation-circle"></i> Search failed</div>';
+            }
+        }
+
+        function displayCourseResults(courses) {
+            const resultsDiv = document.getElementById('courseResults');
+
+            let html = '<h3 class="h4 mb-3"><i class="bi bi-list-check"></i> Search Results</h3>';
+
+            courses.forEach(course => {
+                html += `
+                    <div class="card mb-3">
+                        <div class="card-header" style="background-color: var(--navy-blue); color: white;">
+                            <h5 class="mb-0">${course.course_code} - ${course.course_name}</h5>
+                        </div>
+                        <div class="card-body">
+                            <p class="mb-2"><strong>Instructor:</strong> ${course.instructor || 'N/A'}</p>
+                            ${renderCourseSchedule(course.schedule_slots)}
+                        </div>
+                    </div>
+                `;
+            });
+
+            resultsDiv.innerHTML = html;
+        }
+
+        function renderCourseSchedule(slots) {
+            if (!slots || slots.length === 0) {
+                return '<p class="text-muted mb-0">No schedule information available</p>';
+            }
+
+            // Sort slots by Day and Time
+            // Custom Day Order: M, T, W, Th, F
+            const dayOrder = { 'M': 1, 'T': 2, 'W': 3, 'Th': 4, 'F': 5 };
+
+            slots.sort((a, b) => {
+                const dayDiff = (dayOrder[a.day] || 99) - (dayOrder[b.day] || 99);
+                if (dayDiff !== 0) return dayDiff;
+                return parseInt(a.time_slot) - parseInt(b.time_slot);
+            });
+
+            let tableRows = '';
+
+            slots.forEach(slot => {
+                tableRows += `
+                    <tr>
+                        <td><strong>${slot.day}</strong></td>
+                        <td>${slot.time_slot}</td>
+                        <td>${slot.room}</td>
+                        <td>${slot.building_name}</td>
+                    </tr>
+                `;
+            });
+
+            return `
+                <div class="table-responsive">
+                    <table class="table table-sm table-striped">
+                        <thead>
+                            <tr>
+                                <th>Day</th>
+                                <th>Slot</th>
+                                <th>Room</th>
+                                <th>Building</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${tableRows}
+                        </tbody>
+                    </table>
+                </div>
+            `;
+        }
+
+        function attachEventListeners() {
+            document.getElementById('roomSelect').addEventListener('change', function () {
+                const room = this.value;
+                if (room) {
+                    loadRoomSchedule(room);
+                } else {
+                    document.getElementById('scheduleGridContainer').classList.add('d-none');
+                }
+            });
+
+            // FIX: Semester Change Listener
+            document.getElementById('semesterSelect').addEventListener('change', function () {
+                const semester = this.value;
+                console.log('📅 Semester changed to:', semester);
+
+                // If a room is currently selected, reload its schedule for the new semester
+                const roomSelect = document.getElementById('roomSelect');
+                if (roomSelect && roomSelect.value) {
+                    loadRoomSchedule(roomSelect.value);
+                }
+            });
+
+            document.getElementById('searchBtn').addEventListener('click', searchCourse);
+
+            document.getElementById('courseSearch').addEventListener('keypress', function (e) {
+                if (e.key === 'Enter') {
+                    searchCourse();
+                }
+            });
+
+            console.log('✅ Event listeners attached');
+        }
+    </script>
+</body>
+
+</html>
