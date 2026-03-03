@@ -4,65 +4,61 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Boğaziçi University Room Schedule Viewer</title>
+    <title>BOUN Classroom Monitor</title>
 
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
 
     <!-- Google Fonts - Inter -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 
     <!-- Custom CSS -->
     <link rel="stylesheet" href="static/styles.css">
 </head>
 
 <body>
-    <!-- Header -->
-    <div class="hero-section">
-        <div class="container-fluid">
-            <div class="text-center">
-                <h1 class="display-4">📅 Boğaziçi Room Schedule Viewer</h1>
-                <p class="lead">v0.5 pre-release test version</p>
-            </div>
+    <!-- Top Bar: Semester + Disclaimer -->
+    <div class="top-bar">
+        <div class="top-bar-left">
+            <label for="semesterSelect"><i class="bi bi-calendar3"></i> Semester</label>
+            <select id="semesterSelect">
+                <option value="">Loading...</option>
+            </select>
+        </div>
+        <div class="disclaimer-badge"
+            title="This tool is not officially affiliated with Boğaziçi University. Schedule data is sourced from the public registration page and may not be fully accurate.">
+            <i class="bi bi-info-circle"></i>
+            <span>Unofficial · Data may be inaccurate</span>
         </div>
     </div>
 
+    <!-- Hero -->
+    <div class="hero-section">
+        <h1>BOUN Classroom Monitor</h1>
+        <span class="version-tag">v0.5 pre-release</span>
+    </div>
+
     <!-- Main Content -->
-    <div class="container-fluid px-4 pb-5">
+    <div class="container-fluid px-4 pb-5" style="max-width: 1200px;">
 
-        <!-- Semester Selection -->
-        <div class="row mb-4">
-            <div class="col-md-6 mx-auto">
-                <div class="card">
-                    <div class="card-body">
-                        <label for="semesterSelect" class="form-label">
-                            <i class="bi bi-calendar3"></i> Select Semester
-                        </label>
-                        <select id="semesterSelect" class="form-select form-select-lg">
-                            <option value="">Loading...</option>
-                        </select>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Mode Selector -->
-        <div class="row mb-4">
-            <div class="col-md-8 mx-auto">
+        <!-- Mode Toggle -->
+        <div class="row mb-4 mt-4">
+            <div class="col-lg-8 mx-auto">
                 <div class="mode-toggle-container">
+                    <div id="modeSlider" class="mode-toggle-slider"></div>
                     <button id="modeSchedule" class="mode-toggle active" onclick="switchMode('schedule')">
-                        <i class="bi bi-calendar-week"></i> View Room Schedule
+                        <i class="bi bi-calendar-week"></i> Room Schedule
                     </button>
                     <button id="modeAvailable" class="mode-toggle" onclick="switchMode('available')">
-                        <i class="bi bi-door-open"></i> Find Available Classroom
+                        <i class="bi bi-door-open"></i> Available Classrooms
                     </button>
                 </div>
             </div>
         </div>
 
         <!-- ============================================= -->
-        <!-- MODE A: View Room Schedule                    -->
+        <!-- MODE A: Room Schedule                         -->
         <!-- ============================================= -->
         <div id="modeSchedulePanel">
 
@@ -72,9 +68,9 @@
                     <div class="card h-100">
                         <div class="card-body">
                             <label for="buildingSelect" class="form-label">
-                                <i class="bi bi-building"></i> Select Building
+                                <i class="bi bi-building"></i> Building
                             </label>
-                            <select id="buildingSelect" class="form-select form-select-lg">
+                            <select id="buildingSelect" class="form-select">
                                 <option value="">Select a building...</option>
                             </select>
                         </div>
@@ -84,37 +80,37 @@
                     <div class="card h-100">
                         <div class="card-body">
                             <label for="roomSelect" class="form-label">
-                                <i class="bi bi-door-closed"></i> Select Room
+                                <i class="bi bi-door-closed"></i> Room
                             </label>
-                            <select id="roomSelect" class="form-select form-select-lg" disabled>
-                                <option value="">First select a building...</option>
+                            <select id="roomSelect" class="form-select" disabled>
+                                <option value="">Select a building first</option>
                             </select>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Weekly Schedule Grid (Hidden by default) -->
+            <!-- Weekly Schedule Grid -->
             <div id="scheduleGridContainer" class="mb-4 d-none">
                 <div class="card">
-                    <div class="card-header bg-primary text-white">
-                        <h3 class="h5 mb-0" id="gridHeader">Weekly Schedule</h3>
+                    <div class="card-header"
+                        style="background: var(--navy-mid); color: var(--text-primary); padding: 1rem 1.25rem;">
+                        <h3 class="h6 mb-0" id="gridHeader" style="font-weight: 600;">Weekly Schedule</h3>
                     </div>
                     <div class="card-body p-0">
                         <div class="table-responsive">
                             <table class="schedule-grid">
                                 <thead>
                                     <tr>
-                                        <th style="width: 100px;">Time</th>
-                                        <th>Monday</th>
-                                        <th>Tuesday</th>
-                                        <th>Wednesday</th>
-                                        <th>Thursday</th>
-                                        <th>Friday</th>
+                                        <th style="width: 80px;">Time</th>
+                                        <th>Mon</th>
+                                        <th>Tue</th>
+                                        <th>Wed</th>
+                                        <th>Thu</th>
+                                        <th>Fri</th>
                                     </tr>
                                 </thead>
-                                <tbody id="scheduleGridBody">
-                                </tbody>
+                                <tbody id="scheduleGridBody"></tbody>
                             </table>
                         </div>
                     </div>
@@ -122,20 +118,20 @@
             </div>
 
             <!-- Course Search -->
-            <hr class="my-5">
+            <hr class="my-4" style="border-color: var(--border-color);">
 
             <div class="mb-4">
-                <h2 class="h4 mb-3"><i class="bi bi-search"></i> Search Courses</h2>
+                <h2 class="h5 mb-3" style="color: var(--text-secondary);"><i class="bi bi-search"></i> Course Search
+                </h2>
                 <div class="card">
                     <div class="card-body">
                         <div class="row g-3">
                             <div class="col-md-8">
-                                <input type="text" id="courseSearch" class="form-control form-control-lg"
-                                    placeholder="Enter course code (e.g., 'CE', 'CMPE')...">
-                                <small class="text-muted">Searches course codes only (strict matching)</small>
+                                <input type="text" id="courseSearch" class="form-control"
+                                    placeholder="Enter course code (e.g., CE, CMPE 150)...">
                             </div>
                             <div class="col-md-4">
-                                <button id="searchBtn" class="btn btn-primary btn-lg w-100">
+                                <button id="searchBtn" class="btn btn-primary w-100">
                                     <i class="bi bi-search"></i> Search
                                 </button>
                             </div>
@@ -144,24 +140,23 @@
                 </div>
             </div>
 
-            <!-- Search Results -->
             <div id="courseResults"></div>
         </div>
 
         <!-- ============================================= -->
-        <!-- MODE B: Find Available Classroom              -->
+        <!-- MODE B: Available Classrooms                  -->
         <!-- ============================================= -->
         <div id="modeAvailablePanel" class="d-none">
 
-            <!-- Building Selection for Available -->
+            <!-- Building Selection -->
             <div class="row mb-4">
                 <div class="col-md-6 mx-auto">
                     <div class="card">
                         <div class="card-body">
                             <label for="availBuildingSelect" class="form-label">
-                                <i class="bi bi-building"></i> Select Building
+                                <i class="bi bi-building"></i> Building
                             </label>
-                            <select id="availBuildingSelect" class="form-select form-select-lg">
+                            <select id="availBuildingSelect" class="form-select">
                                 <option value="">All Buildings</option>
                             </select>
                         </div>
@@ -169,27 +164,26 @@
                 </div>
             </div>
 
-            <!-- Time Selector -->
+            <!-- Time Navigation: ← Previous Hour  |  TIME  |  Next Hour → -->
             <div class="row mb-4">
                 <div class="col-md-8 mx-auto">
                     <div class="card">
-                        <div class="card-body text-center">
-                            <label class="form-label d-block mb-3">
-                                <i class="bi bi-clock"></i> Select Time
+                        <div class="card-body">
+                            <label class="form-label d-block text-center mb-3">
+                                <i class="bi bi-clock"></i> Time Slot
                             </label>
-                            <div id="currentTimeDisplay" class="mb-3"
-                                style="font-size: 1.1rem; color: var(--navy-blue);">
-                                <!-- Filled by JS -->
-                            </div>
-                            <div class="time-btn-group">
-                                <button class="time-btn active" data-offset="0"
-                                    onclick="selectTimeOffset(0, this)">Now</button>
-                                <button class="time-btn" data-offset="1" onclick="selectTimeOffset(1, this)">+1
-                                    hour</button>
-                                <button class="time-btn" data-offset="2" onclick="selectTimeOffset(2, this)">+2
-                                    hours</button>
-                                <button class="time-btn" data-offset="3" onclick="selectTimeOffset(3, this)">+3
-                                    hours</button>
+                            <div class="time-nav">
+                                <button class="time-nav-btn" onclick="changeTimeOffset(-1)">
+                                    <i class="bi bi-chevron-left"></i> Previous Hour
+                                </button>
+                                <div class="time-display">
+                                    <div class="time-big" id="timeDisplayBig">--:--</div>
+                                    <div class="time-detail" id="timeDisplayDetail"></div>
+                                </div>
+                                <button class="time-nav-btn" onclick="changeTimeOffset(1)">
+                                    Next Hour <i class="bi bi-chevron-right"
+                                        style="margin-right:0; margin-left:4px;"></i>
+                                </button>
                             </div>
                         </div>
                     </div>
@@ -199,62 +193,79 @@
             <!-- Find Button -->
             <div class="row mb-4">
                 <div class="col-md-4 mx-auto">
-                    <button id="findAvailableBtn" class="btn btn-primary btn-lg w-100"
-                        onclick="findAvailableClassrooms()">
+                    <button id="findAvailableBtn" class="btn btn-primary w-100" onclick="findAvailableClassrooms()">
                         <i class="bi bi-search"></i> Find Available Classrooms
                     </button>
                 </div>
             </div>
 
-            <!-- Available Classrooms Results -->
+            <!-- Results -->
             <div id="availableResults"></div>
         </div>
     </div>
 
+    <!-- Footer -->
+    <footer
+        style="text-align:center; padding:2.5rem 1rem; margin-top:2rem; border-top:1px solid var(--border-color); color:var(--text-muted); font-size:0.8rem; line-height:1.6;">
+        <p style="font-size:1rem; margin-bottom:0.5rem;">🍀 Good luck in the new semester!</p>
+        <p style="max-width:600px; margin:0 auto;">This website has no affiliation with Boğaziçi University. Please
+            check <a href="https://registration.boun.edu.tr" target="_blank" style="color:var(--light-blue);">BOUN
+                registration</a> for the most up-to-date schedule and classroom details for your classes. The
+            information presented on this page may sometimes lag behind the registration website.</p>
+    </footer>
+
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
-    <!-- Custom JavaScript -->
     <script>
-        console.log('v0.5 - App Started');
+        console.log('BOUN Classroom Monitor v0.5');
 
         // =====================================================
-        // STATIC DATA & GLOBAL STATE
+        // DATA & STATE
         // =====================================================
 
         const BUILDINGS = [
-            { "code": "M", "name": "Mühendislik Binası - Perkins Hall", "prefixes": ["M", "VYKM"] },
-            { "code": "İB", "name": "Washburn Hall - İİBF", "prefixes": ["İB", "IB"] },
-            { "code": "KB", "name": "Kare Blok", "prefixes": ["KB", "MAXWELL", "MULTI"] },
-            { "code": "TB", "name": "Anderson Hall - Fen-Edebiyat Fakültesi", "prefixes": ["TB"] },
-            { "code": "NH", "name": "New Hall", "prefixes": ["NH"] },
-            { "code": "EF", "name": "Eğitim Fakültesi", "prefixes": ["EF"] },
-            { "code": "BM", "name": "Bilgisayar Müh. Binası", "prefixes": ["BM"] },
+            { "code": "BM", "name": "Computer Engineering Building", "prefixes": ["BM"] },
+            { "code": "BME", "name": "Institute of Biomedical Engineering", "prefixes": ["BME"], "hidden": true },
+            { "code": "EF", "name": "The Faculty of Education", "prefixes": ["EF"] },
+            { "code": "ET", "name": "ETA-B Block", "prefixes": ["ET"] },
+            { "code": "GKM", "name": "Garanti Cultural Centre", "prefixes": ["GKM"] },
+            { "code": "HH", "name": "Hamlin Hall (Former Men's Dormitory Building)", "prefixes": ["HH"] },
+            { "code": "HISAR", "name": "Hisar Campus", "prefixes": ["HA", "HB", "HC", "HD", "HE"] },
+            { "code": "İB", "name": "Washburn Hall (The Faculty of Economics and Administrative Sciences)", "prefixes": ["İB", "IB"] },
             { "code": "JF", "name": "John Freely Hall", "prefixes": ["JF"] },
-            { "code": "NB", "name": "Natuk Birkan", "prefixes": ["NB"] },
-            { "code": "SH", "name": "Sloane Hall", "prefixes": ["SH"] },
-            { "code": "ET", "name": "ETA-B Blok", "prefixes": ["ET"] },
-            { "code": "KP", "name": "Kuzey Park", "prefixes": ["KP"] },
-            { "code": "HISAR", "name": "Hisar Kampüsü", "prefixes": ["HA", "HB", "HC", "HD", "HE"] },
-            { "code": "GKM", "name": "Garanti Kültür Merkezi", "prefixes": ["GKM"] },
-            { "code": "BME", "name": "Biyomedikal Müh. Enstitüsü", "prefixes": ["BME"] },
-            { "code": "HH", "name": "Hamlin Hall", "prefixes": ["HH"] },
+            { "code": "KB", "name": "Science and Engineering Building", "prefixes": ["KB", "MAXWELL", "MULTI"] },
+            { "code": "KP", "name": "North Park Building", "prefixes": ["KP"] },
+            { "code": "M", "name": "Perkins Hall (The Faculty of Engineering)", "prefixes": ["M", "VYKM"] },
+            { "code": "NB", "name": "Natuk Birkan Building", "prefixes": ["NB"] },
+            { "code": "NH", "name": "New Hall", "prefixes": ["NH"] },
+            { "code": "SH", "name": "Sloane Hall (Departments of Psychology and Sociology)", "prefixes": ["SH"] },
+            { "code": "TB", "name": "Anderson Hall (Fen-Edebiyat)", "prefixes": ["TB"] },
+            { "code": "VB", "name": "Institute For Data Science And Artificial Intelligence", "prefixes": ["VB"] },
         ];
 
-        // Day mapping: JS getDay() → schedule day code
+        // Rooms to exclude from "Available Classrooms" (labs, special rooms)
+        const EXCLUDED_ROOMS = new Set(['M 3160', 'M 3160 CAD LAB']);
+
         const JS_DAY_TO_CODE = { 1: 'M', 2: 'T', 3: 'W', 4: 'Th', 5: 'F' };
+        const DAY_STANDARDIZATION = {
+            'Monday': 'M', 'M': 'M', 'monday': 'M',
+            'Tuesday': 'T', 'T': 'T', 'tuesday': 'T',
+            'Wednesday': 'W', 'W': 'W', 'wednesday': 'W',
+            'Thursday': 'Th', 'Th': 'Th', 'thursday': 'Th',
+            'Friday': 'F', 'F': 'F', 'friday': 'F'
+        };
 
         let selectedBuilding = null;
         let selectedRoom = null;
         let currentMode = 'schedule';
         let timeOffset = 0;
-
-        // Cached data
+        let hasSearchedAvailable = false;
         let cachedRooms = null;
         let cachedCourses = null;
 
         // =====================================================
-        // HELPER FUNCTIONS (ported from Python backend)
+        // HELPERS
         // =====================================================
 
         function superNormalizeRoom(room) {
@@ -265,33 +276,22 @@
         function normalizeRoomName(room) {
             if (!room) return null;
             room = room.trim();
-            const pattern = /^([A-Za-zİıĞğÜüŞşÖöÇç]+)(\d+.*)$/;
-            const match = room.match(pattern);
-            if (match) {
-                return `${match[1]} ${match[2]}`;
-            }
-            return room;
+            const m = room.match(/^([A-Za-zİıĞğÜüŞşÖöÇç]+)(\d+.*)$/);
+            return m ? `${m[1]} ${m[2]}` : room;
         }
 
         function isValidRoom(room) {
             if (!room) return false;
-            room = room.trim();
-            const pattern = /^[A-Za-zİıĞğÜüŞşÖöÇç]+\s*\d+/;
-            return pattern.test(room);
+            return /^[A-Za-zİıĞğÜüŞşÖöÇç]+\s*\d+/.test(room.trim());
         }
 
         function getBuildingNameForRoom(room) {
             if (!room) return null;
-            const roomUpper = room.replace(/\s/g, '').toUpperCase().trim();
-            if (roomUpper.startsWith("MAXWELL") || roomUpper.startsWith("MULTI")) {
-                return "Kare Blok";
-            }
-            for (const building of BUILDINGS) {
-                for (const prefix of building.prefixes) {
-                    const prefixNoSpace = prefix.replace(/\s/g, '').toUpperCase();
-                    if (roomUpper.startsWith(prefixNoSpace)) {
-                        return building.name;
-                    }
+            const ru = room.replace(/\s/g, '').toUpperCase().trim();
+            if (ru.startsWith("MAXWELL") || ru.startsWith("MULTI")) return "Kare Blok";
+            for (const b of BUILDINGS) {
+                for (const p of b.prefixes) {
+                    if (ru.startsWith(p.replace(/\s/g, '').toUpperCase())) return b.name;
                 }
             }
             return null;
@@ -299,153 +299,107 @@
 
         function getBuildingCodeForRoom(room) {
             if (!room) return null;
-            const roomUpper = room.replace(/\s/g, '').toUpperCase().trim();
-            if (roomUpper.startsWith("MAXWELL") || roomUpper.startsWith("MULTI")) {
-                return "KB";
-            }
-            for (const building of BUILDINGS) {
-                for (const prefix of building.prefixes) {
-                    const prefixNoSpace = prefix.replace(/\s/g, '').toUpperCase();
-                    if (roomUpper.startsWith(prefixNoSpace)) {
-                        return building.code;
-                    }
+            const ru = room.replace(/\s/g, '').toUpperCase().trim();
+            if (ru.startsWith("MAXWELL") || ru.startsWith("MULTI")) return "KB";
+            for (const b of BUILDINGS) {
+                for (const p of b.prefixes) {
+                    if (ru.startsWith(p.replace(/\s/g, '').toUpperCase())) return b.code;
                 }
             }
             return null;
         }
 
         // =====================================================
-        // SCHEDULE FLATTENING
+        // SCHEDULE PARSING
         // =====================================================
 
-        const DAY_STANDARDIZATION = {
-            'Monday': 'M', 'M': 'M', 'monday': 'M',
-            'Tuesday': 'T', 'T': 'T', 'tuesday': 'T',
-            'Wednesday': 'W', 'W': 'W', 'wednesday': 'W',
-            'Thursday': 'Th', 'Th': 'Th', 'thursday': 'Th',
-            'Friday': 'F', 'F': 'F', 'friday': 'F'
-        };
-
-        function smartParseSlots(s, target, currentSlots) {
-            if (target === 0) return s.length === 0 ? currentSlots : null;
+        function smartParseSlots(s, target, cur) {
+            if (target === 0) return s.length === 0 ? cur : null;
             if (s.length === 0) return null;
-            const digit1 = parseInt(s[0]);
-            const res1 = smartParseSlots(s.substring(1), target - 1, [...currentSlots, digit1]);
-            if (res1) return res1;
+            const r1 = smartParseSlots(s.substring(1), target - 1, [...cur, parseInt(s[0])]);
+            if (r1) return r1;
             if (s.length >= 2) {
-                const val2 = parseInt(s.substring(0, 2));
-                if (val2 >= 10 && val2 <= 13) {
-                    const res2 = smartParseSlots(s.substring(2), target - 1, [...currentSlots, val2]);
-                    if (res2) return res2;
+                const v = parseInt(s.substring(0, 2));
+                if (v >= 10 && v <= 13) {
+                    const r2 = smartParseSlots(s.substring(2), target - 1, [...cur, v]);
+                    if (r2) return r2;
                 }
             }
             return null;
         }
 
-        function parseDayString(rawDayStr) {
+        function parseDayString(raw) {
             const days = [];
             let j = 0;
-            while (j < rawDayStr.length) {
-                if (j < rawDayStr.length - 1 && rawDayStr.substring(j, j + 2) === 'Th') {
-                    days.push('Th');
-                    j += 2;
-                } else {
-                    days.push(rawDayStr[j]);
-                    j += 1;
-                }
+            while (j < raw.length) {
+                if (j < raw.length - 1 && raw.substring(j, j + 2) === 'Th') { days.push('Th'); j += 2; }
+                else { days.push(raw[j]); j++; }
             }
             return days;
         }
 
-        function parseTimeSlots(timeSlotStr, targetCount) {
-            let slots = smartParseSlots(timeSlotStr, targetCount, []);
+        function parseTimeSlots(str, count) {
+            let slots = smartParseSlots(str, count, []);
             if (!slots) {
                 slots = [];
                 let i = 0;
-                while (i < timeSlotStr.length) {
-                    if (i < timeSlotStr.length - 1) {
-                        const two = timeSlotStr.substring(i, i + 2);
-                        if (['10', '11', '12', '13'].includes(two)) {
-                            slots.push(parseInt(two));
-                            i += 2;
-                            continue;
-                        }
+                while (i < str.length) {
+                    if (i < str.length - 1 && ['10', '11', '12', '13'].includes(str.substring(i, i + 2))) {
+                        slots.push(parseInt(str.substring(i, i + 2))); i += 2; continue;
                     }
-                    if (/\d/.test(timeSlotStr[i])) {
-                        slots.push(parseInt(timeSlotStr[i]));
-                    }
-                    i += 1;
+                    if (/\d/.test(str[i])) slots.push(parseInt(str[i]));
+                    i++;
                 }
             }
             return slots;
         }
 
-        function getFormattedRoomSchedule(roomName, semester, coursesData) {
-            const superNormRoom = superNormalizeRoom(roomName);
-            const flattenedSchedule = [];
-            const semesterCourses = coursesData.filter(c => c.semester === semester);
-
-            for (const course of semesterCourses) {
-                if (!course.slots) continue;
-                for (const slot of course.slots) {
-                    if (!slot.r) continue;
-                    const slotRooms = slot.r.split('|');
-                    for (let slotRoom of slotRooms) {
-                        slotRoom = slotRoom.trim();
-                        if (!slotRoom) continue;
-                        if (superNormalizeRoom(slotRoom) !== superNormRoom) continue;
-
-                        const individualDays = parseDayString((slot.d || '').trim());
-                        const individualSlots = parseTimeSlots(String(slot.t || ''), individualDays.length);
-                        const loopCount = Math.min(individualSlots.length, individualDays.length);
-
-                        for (let k = 0; k < loopCount; k++) {
-                            const standardizedDay = DAY_STANDARDIZATION[individualDays[k]];
-                            if (!standardizedDay) continue;
-                            flattenedSchedule.push({
-                                day: standardizedDay,
-                                time_slot: individualSlots[k],
-                                course_code: course.course_code
-                            });
+        function getFormattedRoomSchedule(roomName, semester, data) {
+            const norm = superNormalizeRoom(roomName);
+            const result = [];
+            for (const c of data.filter(x => x.semester === semester)) {
+                if (!c.slots) continue;
+                for (const s of c.slots) {
+                    if (!s.r) continue;
+                    for (let r of s.r.split('|')) {
+                        r = r.trim();
+                        if (!r || superNormalizeRoom(r) !== norm) continue;
+                        const days = parseDayString((s.d || '').trim());
+                        const slots = parseTimeSlots(String(s.t || ''), days.length);
+                        const n = Math.min(slots.length, days.length);
+                        for (let k = 0; k < n; k++) {
+                            const d = DAY_STANDARDIZATION[days[k]];
+                            if (d) result.push({ day: d, time_slot: slots[k], course_code: c.course_code });
                         }
                     }
                 }
             }
-            return flattenedSchedule;
+            return result;
         }
 
-        /**
-         * Build a lookup: { "ROOMNAME": Set of "DAY-SLOT" strings }
-         * for a given semester across ALL rooms
-         */
-        function buildOccupancyMap(semester, coursesData) {
-            const occupancy = {}; // roomSuperNorm -> Set of "DAY-SLOT"
-            const semesterCourses = coursesData.filter(c => c.semester === semester);
-
-            for (const course of semesterCourses) {
-                if (!course.slots) continue;
-                for (const slot of course.slots) {
-                    if (!slot.r) continue;
-                    const slotRooms = slot.r.split('|');
-                    for (let slotRoom of slotRooms) {
-                        slotRoom = slotRoom.trim();
-                        if (!slotRoom) continue;
-                        const superNorm = superNormalizeRoom(slotRoom);
-
-                        const individualDays = parseDayString((slot.d || '').trim());
-                        const individualSlots = parseTimeSlots(String(slot.t || ''), individualDays.length);
-                        const loopCount = Math.min(individualSlots.length, individualDays.length);
-
-                        for (let k = 0; k < loopCount; k++) {
-                            const standardizedDay = DAY_STANDARDIZATION[individualDays[k]];
-                            if (!standardizedDay) continue;
-                            if (!occupancy[superNorm]) occupancy[superNorm] = new Set();
-                            occupancy[superNorm].add(`${standardizedDay}-${individualSlots[k]}`);
+        function buildOccupancyMap(semester, data) {
+            const occ = {};
+            for (const c of data.filter(x => x.semester === semester)) {
+                if (!c.slots) continue;
+                for (const s of c.slots) {
+                    if (!s.r) continue;
+                    for (let r of s.r.split('|')) {
+                        r = r.trim();
+                        if (!r) continue;
+                        const sn = superNormalizeRoom(r);
+                        const days = parseDayString((s.d || '').trim());
+                        const slots = parseTimeSlots(String(s.t || ''), days.length);
+                        const n = Math.min(slots.length, days.length);
+                        for (let k = 0; k < n; k++) {
+                            const d = DAY_STANDARDIZATION[days[k]];
+                            if (!d) continue;
+                            if (!occ[sn]) occ[sn] = new Set();
+                            occ[sn].add(`${d}-${slots[k]}`);
                         }
                     }
                 }
             }
-            return occupancy;
+            return occ;
         }
 
         // =====================================================
@@ -453,24 +407,18 @@
         // =====================================================
 
         async function loadJSON(url) {
-            const response = await fetch(url);
-            if (!response.ok) throw new Error(`Failed to load ${url}: HTTP ${response.status}`);
-            return response.json();
+            const r = await fetch(url);
+            if (!r.ok) throw new Error(`Failed: ${url} (${r.status})`);
+            return r.json();
         }
 
         async function ensureCoursesLoaded() {
-            if (!cachedCourses) {
-                cachedCourses = await loadJSON('data/courses.json');
-                console.log(`Loaded ${cachedCourses.length} courses`);
-            }
+            if (!cachedCourses) cachedCourses = await loadJSON('data/courses.json');
             return cachedCourses;
         }
 
         async function ensureRoomsLoaded() {
-            if (!cachedRooms) {
-                cachedRooms = await loadJSON('data/rooms.json');
-                console.log('Rooms data loaded');
-            }
+            if (!cachedRooms) cachedRooms = await loadJSON('data/rooms.json');
             return cachedRooms;
         }
 
@@ -482,307 +430,274 @@
             currentMode = mode;
             document.getElementById('modeSchedule').classList.toggle('active', mode === 'schedule');
             document.getElementById('modeAvailable').classList.toggle('active', mode === 'available');
-            document.getElementById('modeSchedulePanel').classList.toggle('d-none', mode !== 'schedule');
-            document.getElementById('modeAvailablePanel').classList.toggle('d-none', mode !== 'available');
+            document.getElementById('modeSlider').classList.toggle('right', mode === 'available');
 
-            if (mode === 'available') {
-                updateTimeDisplay();
-            }
+            const schedulePanel = document.getElementById('modeSchedulePanel');
+            const availablePanel = document.getElementById('modeAvailablePanel');
+
+            schedulePanel.classList.toggle('d-none', mode !== 'schedule');
+            availablePanel.classList.toggle('d-none', mode !== 'available');
+
+            // Trigger animation on the visible panel
+            const activePanel = mode === 'schedule' ? schedulePanel : availablePanel;
+            activePanel.classList.remove('panel-animate');
+            void activePanel.offsetWidth; // force reflow
+            activePanel.classList.add('panel-animate');
+
+            if (mode === 'available') { timeOffset = 0; updateTimeDisplay(); }
         }
 
         // =====================================================
-        // INITIALIZATION
+        // INIT
         // =====================================================
 
         document.addEventListener('DOMContentLoaded', async function () {
-            console.log('DOM Loaded, initializing...');
             try {
                 await loadSemesters();
                 populateBuildingDropdowns();
-                console.log('Initialization complete');
-            } catch (error) {
-                console.error('Critical initialization error:', error);
+            } catch (e) {
+                console.error('Init error:', e);
             }
-
             attachEventListeners();
             updateTimeDisplay();
+
+            // Auto-update time every 30 seconds
+            setInterval(() => {
+                if (currentMode === 'available') {
+                    updateTimeDisplay();
+                }
+            }, 30000);
         });
 
         // =====================================================
-        // UI — SEMESTERS & BUILDINGS
+        // SEMESTERS & BUILDINGS
         // =====================================================
 
         async function loadSemesters() {
-            const select = document.getElementById('semesterSelect');
+            const sel = document.getElementById('semesterSelect');
             try {
-                const semesters = await loadJSON('data/semesters.json');
-                select.innerHTML = '<option value="">Select semester</option>';
-                if (semesters && semesters.length > 0) {
-                    semesters.forEach(s => {
-                        const opt = document.createElement('option');
-                        opt.value = s;
-                        opt.textContent = s;
-                        select.appendChild(opt);
-                    });
-                    select.value = semesters[0];
-                }
-            } catch (error) {
-                console.error('Error loading semesters:', error);
-                select.innerHTML = '<option value="">Failed to load</option>';
-                select.disabled = true;
-                throw error;
+                const data = await loadJSON('data/semesters.json');
+                sel.innerHTML = '<option value="">Semester</option>';
+                data.forEach(s => {
+                    const o = document.createElement('option');
+                    o.value = s; o.textContent = s;
+                    sel.appendChild(o);
+                });
+                if (data.length > 0) sel.value = data[0];
+            } catch (e) {
+                sel.innerHTML = '<option value="">Failed</option>';
+                sel.disabled = true;
+                throw e;
             }
         }
 
         function populateBuildingDropdowns() {
-            // Mode A building dropdown
-            const bSelect = document.getElementById('buildingSelect');
-            bSelect.innerHTML = '<option value="">Select a building...</option>';
-            BUILDINGS.forEach(b => {
-                const opt = document.createElement('option');
-                opt.value = b.code;
-                opt.textContent = b.name;
-                bSelect.appendChild(opt);
-            });
-
-            // Mode B building dropdown
-            const abSelect = document.getElementById('availBuildingSelect');
-            abSelect.innerHTML = '<option value="">All Buildings</option>';
-            BUILDINGS.forEach(b => {
-                const opt = document.createElement('option');
-                opt.value = b.code;
-                opt.textContent = b.name;
-                abSelect.appendChild(opt);
-            });
+            const fill = (id, defaultText) => {
+                const sel = document.getElementById(id);
+                sel.innerHTML = `<option value="">${defaultText}</option>`;
+                BUILDINGS.filter(b => !b.hidden).forEach(b => {
+                    const o = document.createElement('option');
+                    o.value = b.code;
+                    o.textContent = `${b.code} \u2014 ${b.name}`;
+                    sel.appendChild(o);
+                });
+            };
+            fill('buildingSelect', 'Select a building...');
+            fill('availBuildingSelect', 'All Buildings');
         }
 
         // =====================================================
-        // UI — MODE A: ROOM SCHEDULE
+        // MODE A: ROOM SCHEDULE
         // =====================================================
 
         async function onBuildingChange() {
             const code = document.getElementById('buildingSelect').value;
-            const roomSelect = document.getElementById('roomSelect');
-
-            // Always reset room and hide grid
-            roomSelect.innerHTML = '<option value="">First select a building...</option>';
-            roomSelect.disabled = true;
+            const rs = document.getElementById('roomSelect');
+            rs.innerHTML = '<option value="">Select a building first</option>';
+            rs.disabled = true;
             document.getElementById('scheduleGridContainer').classList.add('d-none');
             selectedBuilding = null;
             selectedRoom = null;
-
             if (!code) return;
 
             selectedBuilding = code;
-            roomSelect.innerHTML = '<option value="">Loading rooms...</option>';
-
+            rs.innerHTML = '<option value="">Loading...</option>';
             try {
-                const roomsData = await ensureRoomsLoaded();
-                const rooms = roomsData[code] || [];
-                roomSelect.innerHTML = '<option value="">Select a room...</option>';
-
+                const rooms = (await ensureRoomsLoaded())[code] || [];
+                rs.innerHTML = '<option value="">Select a room...</option>';
                 if (rooms.length > 0) {
-                    rooms.forEach(room => {
-                        const opt = document.createElement('option');
-                        opt.value = room;
-                        opt.textContent = room;
-                        roomSelect.appendChild(opt);
-                    });
-                    roomSelect.disabled = false;
+                    rooms.forEach(r => { const o = document.createElement('option'); o.value = r; o.textContent = r; rs.appendChild(o); });
+                    rs.disabled = false;
                 } else {
-                    roomSelect.innerHTML = '<option value="">No rooms found</option>';
+                    rs.innerHTML = '<option value="">No rooms found</option>';
                 }
-            } catch (error) {
-                console.error('Error loading rooms:', error);
-                roomSelect.innerHTML = '<option value="">Error loading rooms</option>';
+            } catch (e) {
+                rs.innerHTML = '<option value="">Error loading</option>';
             }
         }
 
         async function onRoomChange() {
             const room = document.getElementById('roomSelect').value;
-            if (!room) {
-                document.getElementById('scheduleGridContainer').classList.add('d-none');
-                return;
-            }
+            if (!room) { document.getElementById('scheduleGridContainer').classList.add('d-none'); return; }
             await loadRoomSchedule(room);
         }
 
         async function loadRoomSchedule(room) {
             selectedRoom = room;
-            const semester = document.getElementById('semesterSelect').value;
-            if (!semester) { alert('Please select a semester first'); return; }
+            const sem = document.getElementById('semesterSelect').value;
+            if (!sem) { alert('Please select a semester'); return; }
 
-            const gridContainer = document.getElementById('scheduleGridContainer');
-            const gridBody = document.getElementById('scheduleGridBody');
-            const gridHeader = document.getElementById('gridHeader');
+            const gc = document.getElementById('scheduleGridContainer');
+            const gb = document.getElementById('scheduleGridBody');
+            const gh = document.getElementById('gridHeader');
+            gc.classList.remove('d-none');
 
-            gridContainer.classList.remove('d-none');
-
-            let headerHtml = `Weekly Schedule: ${room}`;
             const bName = getBuildingNameForRoom(room);
-            if (bName) headerHtml += ` <span class="badge bg-info">${bName}</span>`;
-            gridHeader.innerHTML = headerHtml;
-
-            gridBody.innerHTML = '<tr><td colspan="6" class="text-center py-5"><div class="spinner-border text-primary"></div></td></tr>';
+            gh.innerHTML = `${room}` + (bName ? ` <span class="badge bg-info" style="font-size:0.7rem;">${bName}</span>` : '');
+            gb.innerHTML = '<tr><td colspan="6" class="text-center py-4"><div class="spinner-border"></div></td></tr>';
 
             try {
-                const coursesData = await ensureCoursesLoaded();
-                const schedule = getFormattedRoomSchedule(room, semester, coursesData);
+                const schedule = getFormattedRoomSchedule(room, sem, await ensureCoursesLoaded());
                 renderScheduleGrid(schedule);
-            } catch (error) {
-                console.error('Error loading schedule:', error);
-                gridBody.innerHTML = '<tr><td colspan="6" class="text-center text-danger py-4"><i class="bi bi-exclamation-circle"></i> Failed to load schedule</td></tr>';
+            } catch (e) {
+                gb.innerHTML = '<tr><td colspan="6" class="text-center py-4" style="color:#f87171;">Failed to load</td></tr>';
             }
         }
 
         function renderScheduleGrid(schedule) {
-            const gridBody = document.getElementById('scheduleGridBody');
-            if (!gridBody) return;
-
+            const gb = document.getElementById('scheduleGridBody');
             if (!schedule || schedule.length === 0) {
-                gridBody.innerHTML = '<tr><td colspan="6" class="text-center text-warning py-4">No schedule data found for this room/semester combination</td></tr>';
+                gb.innerHTML = '<tr><td colspan="6" class="text-center py-4" style="color:var(--text-muted);">No schedule data for this room/semester</td></tr>';
                 return;
             }
-
-            gridBody.innerHTML = '';
-            const dayMap = { 'Monday': 'M', 'Tuesday': 'T', 'Wednesday': 'W', 'Thursday': 'Th', 'Friday': 'F' };
+            gb.innerHTML = '';
+            const dm = { 'Monday': 'M', 'Tuesday': 'T', 'Wednesday': 'W', 'Thursday': 'Th', 'Friday': 'F' };
             const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
-
             for (let slot = 1; slot <= 13; slot++) {
-                let rowHtml = '<tr>';
-                const timeLabel = (slot + 8).toString().padStart(2, '0') + ':00';
-                rowHtml += `<td><strong>${timeLabel}</strong></td>`;
-
-                days.forEach(dayName => {
-                    const match = schedule.find(item =>
-                        String(item.time_slot) === String(slot) && item.day === dayMap[dayName]
-                    );
-                    rowHtml += match
-                        ? `<td class="slot-occupied">${match.course_code}</td>`
-                        : `<td></td>`;
+                let h = '<tr>';
+                h += `<td style="font-weight:600; color:var(--text-secondary);"><strong>${(slot + 8).toString().padStart(2, '0')}:00</strong></td>`;
+                days.forEach(d => {
+                    const m = schedule.find(i => String(i.time_slot) === String(slot) && i.day === dm[d]);
+                    h += m ? `<td class="slot-occupied">${m.course_code}</td>` : '<td></td>';
                 });
-
-                rowHtml += '</tr>';
-                gridBody.innerHTML += rowHtml;
+                h += '</tr>';
+                gb.innerHTML += h;
             }
         }
 
         // =====================================================
-        // UI — MODE B: FIND AVAILABLE CLASSROOMS
+        // MODE B: AVAILABLE CLASSROOMS
         // =====================================================
 
         function getCurrentSlotInfo(offset) {
             const now = new Date();
             const hour = now.getHours() + offset;
-            const minutes = now.getMinutes();
-            const jsDay = now.getDay(); // 0=Sun, 1=Mon...5=Fri, 6=Sat
+            const min = now.getMinutes();
+            const jsDay = now.getDay();
             const dayCode = JS_DAY_TO_CODE[jsDay] || null;
-            const slot = hour - 8; // slot 1 = 09:00, slot 2 = 10:00, ...
-
+            const slot = hour - 8;
             const dayNames = { 'M': 'Monday', 'T': 'Tuesday', 'W': 'Wednesday', 'Th': 'Thursday', 'F': 'Friday' };
-            const dayName = dayCode ? dayNames[dayCode] : null;
-
             return {
-                hour, minutes, slot, dayCode, dayName,
+                hour, min, slot, dayCode,
+                dayName: dayCode ? dayNames[dayCode] : null,
                 isValid: dayCode !== null && slot >= 1 && slot <= 13,
                 isWeekend: jsDay === 0 || jsDay === 6,
-                displayTime: `${hour.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`
+                displayTime: `${hour.toString().padStart(2, '0')}:${min.toString().padStart(2, '0')}`
             };
         }
 
         function updateTimeDisplay() {
             const info = getCurrentSlotInfo(timeOffset);
-            const el = document.getElementById('currentTimeDisplay');
-            if (!el) return;
+            const big = document.getElementById('timeDisplayBig');
+            const detail = document.getElementById('timeDisplayDetail');
+            if (!big || !detail) return;
 
             if (info.isWeekend) {
-                el.innerHTML = `<i class="bi bi-emoji-sunglasses"></i> It's the weekend! All classrooms are available.`;
+                big.textContent = '🎉 Weekend';
+                detail.textContent = 'All classrooms are available';
             } else if (!info.isValid) {
-                el.innerHTML = `<i class="bi bi-moon-stars"></i> ${info.displayTime} — Outside class hours (09:00 - 21:00)`;
+                big.textContent = info.displayTime;
+                detail.textContent = 'Outside class hours (09:00–21:00)';
             } else {
-                el.innerHTML = `<i class="bi bi-clock"></i> <strong>${info.displayTime}</strong> — ${info.dayName}, Slot ${info.slot} (${(info.slot + 8).toString().padStart(2, '0')}:00 - ${(info.slot + 9).toString().padStart(2, '0')}:00)`;
+                big.textContent = info.displayTime;
+                detail.textContent = `${info.dayName} · Slot ${info.slot} (${(info.slot + 8).toString().padStart(2, '0')}:00–${(info.slot + 9).toString().padStart(2, '0')}:00)`;
             }
         }
 
-        function selectTimeOffset(offset, btn) {
-            timeOffset = offset;
-            document.querySelectorAll('.time-btn').forEach(b => b.classList.remove('active'));
-            btn.classList.add('active');
+        function changeTimeOffset(delta) {
+            const now = new Date();
+            const newHour = now.getHours() + timeOffset + delta;
+            if (newHour < 0 || newHour > 23) return;
+            timeOffset += delta;
             updateTimeDisplay();
+            if (hasSearchedAvailable) findAvailableClassrooms();
         }
 
         async function findAvailableClassrooms() {
-            const semester = document.getElementById('semesterSelect').value;
-            if (!semester) { alert('Please select a semester first'); return; }
+            hasSearchedAvailable = true;
+            const sem = document.getElementById('semesterSelect').value;
+            if (!sem) { alert('Please select a semester'); return; }
 
             const info = getCurrentSlotInfo(timeOffset);
-            const resultsDiv = document.getElementById('availableResults');
+            const rd = document.getElementById('availableResults');
 
             if (info.isWeekend) {
-                resultsDiv.innerHTML = '<div class="alert alert-info"><i class="bi bi-emoji-sunglasses"></i> It\'s the weekend — all classrooms are available!</div>';
+                rd.innerHTML = '<div class="alert alert-info"><i class="bi bi-emoji-sunglasses"></i> It\'s the weekend — all classrooms are available!</div>';
                 return;
             }
             if (!info.isValid) {
-                resultsDiv.innerHTML = '<div class="alert alert-warning"><i class="bi bi-moon-stars"></i> Outside class hours (09:00 - 21:00). Cannot determine availability.</div>';
+                rd.innerHTML = '<div class="alert alert-warning"><i class="bi bi-moon-stars"></i> Outside class hours (09:00–21:00).</div>';
                 return;
             }
 
-            resultsDiv.innerHTML = '<div class="text-center py-5"><div class="spinner-border text-primary"></div></div>';
+            rd.innerHTML = '<div class="text-center py-5"><div class="spinner-border"></div></div>';
 
             try {
-                const [coursesData, roomsData] = await Promise.all([
-                    ensureCoursesLoaded(),
-                    ensureRoomsLoaded()
-                ]);
-
-                const occupancy = buildOccupancyMap(semester, coursesData);
-                const selectedBldg = document.getElementById('availBuildingSelect').value;
+                const [courses, rooms] = await Promise.all([ensureCoursesLoaded(), ensureRoomsLoaded()]);
+                const occ = buildOccupancyMap(sem, courses);
+                const bldg = document.getElementById('availBuildingSelect').value;
                 const key = `${info.dayCode}-${info.slot}`;
+                const list = bldg ? BUILDINGS.filter(b => b.code === bldg) : BUILDINGS;
 
-                // Determine which buildings to check
-                const buildingsToCheck = selectedBldg
-                    ? BUILDINGS.filter(b => b.code === selectedBldg)
-                    : BUILDINGS;
+                let total = 0;
+                let html = `<h3 class="h5 mb-3" style="color:var(--text-secondary);"><i class="bi bi-door-open"></i> Available at ${(info.slot + 8).toString().padStart(2, '0')}:00 — ${info.dayName}</h3>`;
 
-                let totalAvailable = 0;
-                let html = `<h3 class="h4 mb-3"><i class="bi bi-door-open"></i> Available Classrooms at ${(info.slot + 8).toString().padStart(2, '0')}:00 — ${info.dayName}</h3>`;
-
-                buildingsToCheck.forEach(building => {
-                    const rooms = roomsData[building.code] || [];
-                    const available = rooms.filter(room => {
-                        const superNorm = superNormalizeRoom(room);
-                        const roomOccupancy = occupancy[superNorm];
-                        return !roomOccupancy || !roomOccupancy.has(key);
+                list.forEach(b => {
+                    const bRooms = rooms[b.code] || [];
+                    const avail = bRooms.filter(r => {
+                        if (EXCLUDED_ROOMS.has(r)) return false;
+                        const sn = superNormalizeRoom(r);
+                        const o = occ[sn];
+                        return !o || !o.has(key);
                     });
-
-                    if (available.length > 0) {
-                        totalAvailable += available.length;
+                    if (avail.length > 0) {
+                        total += avail.length;
                         html += `
                             <div class="card mb-3">
-                                <div class="card-header" style="background-color: var(--navy-blue); color: white;">
-                                    <h5 class="mb-0"><i class="bi bi-building"></i> ${building.name} <span class="badge bg-success">${available.length} available</span></h5>
+                                <div class="card-header" style="background:var(--navy-mid); color:var(--text-primary); padding:0.8rem 1.25rem;">
+                                    <h5 class="mb-0" style="font-size:0.95rem; font-weight:600;">
+                                        <i class="bi bi-building"></i> ${b.code} — ${b.name}
+                                        <span class="badge" style="background:var(--green-bg); color:var(--green-accent); border:1px solid var(--green-border);">${avail.length} available</span>
+                                    </h5>
                                 </div>
                                 <div class="card-body">
                                     <div class="available-rooms-grid">
-                                        ${available.map(r => `<span class="available-room-badge">${r}</span>`).join('')}
+                                        ${avail.map(r => `<span class="available-room-badge">${r}</span>`).join('')}
                                     </div>
                                 </div>
-                            </div>
-                        `;
+                            </div>`;
                     }
                 });
 
-                if (totalAvailable === 0) {
-                    html += '<div class="alert alert-warning"><i class="bi bi-exclamation-triangle"></i> No available classrooms found for this time slot.</div>';
+                if (total === 0) {
+                    html += '<div class="alert alert-warning"><i class="bi bi-exclamation-triangle"></i> No available classrooms found.</div>';
                 } else {
-                    html = `<div class="alert alert-success mb-3"><i class="bi bi-check-circle"></i> <strong>${totalAvailable}</strong> classrooms available at ${(info.slot + 8).toString().padStart(2, '0')}:00 on ${info.dayName}</div>` + html;
+                    html = `<div class="alert alert-success mb-3"><i class="bi bi-check-circle"></i> <strong>${total}</strong> classrooms available</div>` + html;
                 }
 
-                resultsDiv.innerHTML = html;
-
-            } catch (error) {
-                console.error('Error finding available classrooms:', error);
-                resultsDiv.innerHTML = '<div class="alert alert-danger"><i class="bi bi-exclamation-circle"></i> Failed to search</div>';
+                rd.innerHTML = html;
+            } catch (e) {
+                rd.innerHTML = '<div class="alert alert-danger"><i class="bi bi-exclamation-circle"></i> Search failed</div>';
             }
         }
 
@@ -791,82 +706,88 @@
         // =====================================================
 
         async function searchCourse() {
-            const semester = document.getElementById('semesterSelect').value;
-            const query = document.getElementById('courseSearch').value.trim();
-            const resultsDiv = document.getElementById('courseResults');
+            const sem = document.getElementById('semesterSelect').value;
+            const q = document.getElementById('courseSearch').value.trim();
+            const rd = document.getElementById('courseResults');
 
-            if (!semester) { alert('Please select a semester first'); return; }
-            if (!query) { alert('Please enter a course code'); return; }
+            if (!sem) { alert('Please select a semester'); return; }
+            if (!q) { alert('Please enter a course code'); return; }
 
-            resultsDiv.innerHTML = '<div class="text-center py-5"><div class="spinner-border text-primary"></div></div>';
+            rd.innerHTML = '<div class="text-center py-5"><div class="spinner-border"></div></div>';
 
             try {
-                const coursesData = await ensureCoursesLoaded();
-                const normalizedQuery = query.replace(/[\s.]/g, '').toUpperCase();
-                const matches = coursesData.filter(course => {
-                    if (course.semester !== semester) return false;
-                    return course.course_code.replace(/[\s.]/g, '').toUpperCase().includes(normalizedQuery);
-                });
+                const data = await ensureCoursesLoaded();
+                const nq = q.replace(/[\s.]/g, '').toUpperCase();
+                const matches = data.filter(c => c.semester === sem && c.course_code.replace(/[\s.]/g, '').toUpperCase().includes(nq));
 
                 if (matches.length > 0) {
-                    const displayCourses = matches.map(course => ({
-                        course_code: course.course_code,
-                        course_name: course.course_name,
-                        instructor: course.instructor,
-                        schedule_slots: (course.slots || []).map(s => ({
-                            day: s.d, time_slot: s.t, room: s.r, building_name: s.b
-                        }))
+                    const display = matches.map(c => ({
+                        course_code: c.course_code,
+                        course_name: c.course_name,
+                        instructor: c.instructor,
+                        schedule_slots: c.slots || []
                     }));
-                    displayCourseResults(displayCourses);
+                    displayCourseResults(display);
                 } else {
-                    resultsDiv.innerHTML = '<div class="alert alert-info"><i class="bi bi-info-circle"></i> No courses found matching that code</div>';
+                    rd.innerHTML = '<div class="alert alert-info"><i class="bi bi-info-circle"></i> No courses found</div>';
                 }
-            } catch (error) {
-                console.error('Search error:', error);
-                resultsDiv.innerHTML = '<div class="alert alert-danger"><i class="bi bi-exclamation-circle"></i> Search failed</div>';
+            } catch (e) {
+                rd.innerHTML = '<div class="alert alert-danger"><i class="bi bi-exclamation-circle"></i> Search failed</div>';
             }
         }
 
         function displayCourseResults(courses) {
-            const resultsDiv = document.getElementById('courseResults');
-            let html = '<h3 class="h4 mb-3"><i class="bi bi-list-check"></i> Search Results</h3>';
-            courses.forEach(course => {
-                html += `
+            const rd = document.getElementById('courseResults');
+            let h = `<h3 class="h5 mb-3" style="color:var(--text-secondary);"><i class="bi bi-list-check"></i> Results (${courses.length})</h3>`;
+            courses.forEach(c => {
+                h += `
                     <div class="card mb-3">
-                        <div class="card-header" style="background-color: var(--navy-blue); color: white;">
-                            <h5 class="mb-0">${course.course_code} - ${course.course_name}</h5>
+                        <div class="card-header" style="background:var(--navy-mid); color:var(--text-primary); padding:0.8rem 1.25rem;">
+                            <h5 class="mb-0" style="font-size:0.95rem;">${c.course_code} — ${c.course_name}</h5>
                         </div>
                         <div class="card-body">
-                            <p class="mb-2"><strong>Instructor:</strong> ${course.instructor || 'N/A'}</p>
-                            ${renderCourseSchedule(course.schedule_slots)}
+                            <p class="mb-2" style="color:var(--text-secondary);"><strong>Instructor:</strong> ${c.instructor || 'N/A'}</p>
+                            ${renderCourseSchedule(c.schedule_slots)}
                         </div>
-                    </div>
-                `;
+                    </div>`;
             });
-            resultsDiv.innerHTML = html;
+            rd.innerHTML = h;
         }
 
         function renderCourseSchedule(slots) {
-            if (!slots || slots.length === 0) {
-                return '<p class="text-muted mb-0">No schedule information available</p>';
-            }
-            const dayOrder = { 'M': 1, 'T': 2, 'W': 3, 'Th': 4, 'F': 5 };
-            slots.sort((a, b) => {
-                const dd = (dayOrder[a.day] || 99) - (dayOrder[b.day] || 99);
-                return dd !== 0 ? dd : parseInt(a.time_slot) - parseInt(b.time_slot);
-            });
-            let rows = '';
+            if (!slots || slots.length === 0) return '<p style="color:var(--text-muted);">No schedule info</p>';
+            const dayNames = { 'M': 'Mon', 'T': 'Tue', 'W': 'Wed', 'Th': 'Thu', 'F': 'Fri' };
+            const order = { 'M': 1, 'T': 2, 'W': 3, 'Th': 4, 'F': 5 };
+
+            // Flatten each slot entry into individual day-slot-room rows
+            const flat = [];
             slots.forEach(s => {
-                rows += `<tr><td><strong>${s.day}</strong></td><td>${s.time_slot}</td><td>${s.room}</td><td>${s.building_name}</td></tr>`;
+                const days = parseDayString((s.d || '').trim());
+                const timeSlots = parseTimeSlots(String(s.t || ''), days.length);
+                const rooms = (s.r || '').split('|').map(r => r.trim()).filter(r => r);
+                const n = Math.min(days.length, timeSlots.length);
+                for (let i = 0; i < n; i++) {
+                    const dayCode = DAY_STANDARDIZATION[days[i]];
+                    if (!dayCode) continue;
+                    const room = rooms[i] || rooms[0] || 'TBA';
+                    const building = getBuildingNameForRoom(room) || '—';
+                    flat.push({ day: dayCode, dayName: dayNames[dayCode] || dayCode, slot: timeSlots[i], time: `${(timeSlots[i] + 8).toString().padStart(2, '0')}:00`, room, building });
+                }
+            });
+
+            flat.sort((a, b) => ((order[a.day] || 99) - (order[b.day] || 99)) || (a.slot - b.slot));
+
+            let rows = '';
+            flat.forEach(f => {
+                rows += `<tr><td><strong>${f.dayName}</strong></td><td>${f.time}</td><td>${f.room}</td><td>${f.building}</td></tr>`;
             });
             return `
                 <div class="table-responsive">
-                    <table class="table table-sm table-striped">
-                        <thead><tr><th>Day</th><th>Slot</th><th>Room</th><th>Building</th></tr></thead>
+                    <table class="table table-sm table-striped mb-0">
+                        <thead><tr><th>Day</th><th>Time</th><th>Room</th><th>Building</th></tr></thead>
                         <tbody>${rows}</tbody>
                     </table>
-                </div>
-            `;
+                </div>`;
         }
 
         // =====================================================
@@ -876,21 +797,12 @@
         function attachEventListeners() {
             document.getElementById('buildingSelect').addEventListener('change', onBuildingChange);
             document.getElementById('roomSelect').addEventListener('change', onRoomChange);
-
-            document.getElementById('semesterSelect').addEventListener('change', function () {
-                // Reset room schedule if building/room was selected
-                const roomSelect = document.getElementById('roomSelect');
-                if (roomSelect && roomSelect.value) {
-                    loadRoomSchedule(roomSelect.value);
-                }
+            document.getElementById('semesterSelect').addEventListener('change', () => {
+                const rs = document.getElementById('roomSelect');
+                if (rs && rs.value) loadRoomSchedule(rs.value);
             });
-
             document.getElementById('searchBtn').addEventListener('click', searchCourse);
-            document.getElementById('courseSearch').addEventListener('keypress', function (e) {
-                if (e.key === 'Enter') searchCourse();
-            });
-
-            console.log('Event listeners attached');
+            document.getElementById('courseSearch').addEventListener('keypress', e => { if (e.key === 'Enter') searchCourse(); });
         }
     </script>
 </body>
