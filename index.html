@@ -47,10 +47,10 @@
             <div class="col-lg-8 mx-auto">
                 <div class="mode-toggle-container">
                     <div id="modeSlider" class="mode-toggle-slider"></div>
-                    <button id="modeSchedule" class="mode-toggle active" onclick="switchMode('schedule')">
+                    <button id="modeSchedule" class="mode-toggle active">
                         <i class="bi bi-calendar-week"></i> Room Schedule
                     </button>
-                    <button id="modeAvailable" class="mode-toggle" onclick="switchMode('available')">
+                    <button id="modeAvailable" class="mode-toggle">
                         <i class="bi bi-door-open"></i> Available Classrooms
                     </button>
                 </div>
@@ -173,14 +173,14 @@
                                 <i class="bi bi-clock"></i> Time Slot
                             </label>
                             <div class="time-nav">
-                                <button class="time-nav-btn" onclick="changeTimeOffset(-1)">
+                                <button id="prevHourBtn" class="time-nav-btn">
                                     <i class="bi bi-chevron-left"></i> Previous Hour
                                 </button>
                                 <div class="time-display">
                                     <div class="time-big" id="timeDisplayBig">--:--</div>
                                     <div class="time-detail" id="timeDisplayDetail"></div>
                                 </div>
-                                <button class="time-nav-btn" onclick="changeTimeOffset(1)">
+                                <button id="nextHourBtn" class="time-nav-btn">
                                     Next Hour <i class="bi bi-chevron-right"
                                         style="margin-right:0; margin-left:4px;"></i>
                                 </button>
@@ -193,7 +193,7 @@
             <!-- Find Button -->
             <div class="row mb-4">
                 <div class="col-md-4 mx-auto">
-                    <button id="findAvailableBtn" class="btn btn-primary w-100" onclick="findAvailableClassrooms()">
+                    <button id="findAvailableBtn" class="btn btn-primary w-100">
                         <i class="bi bi-search"></i> Find Available Classrooms
                     </button>
                 </div>
@@ -807,6 +807,11 @@
         // =====================================================
 
         function attachEventListeners() {
+            document.getElementById('modeSchedule').addEventListener('click', () => switchMode('schedule'));
+            document.getElementById('modeAvailable').addEventListener('click', () => switchMode('available'));
+            document.getElementById('prevHourBtn').addEventListener('click', () => changeTimeOffset(-1));
+            document.getElementById('nextHourBtn').addEventListener('click', () => changeTimeOffset(1));
+            document.getElementById('findAvailableBtn').addEventListener('click', findAvailableClassrooms);
             document.getElementById('buildingSelect').addEventListener('change', onBuildingChange);
             document.getElementById('roomSelect').addEventListener('change', onRoomChange);
             document.getElementById('semesterSelect').addEventListener('change', () => {
@@ -814,7 +819,7 @@
                 if (rs && rs.value) loadRoomSchedule(rs.value);
             });
             document.getElementById('searchBtn').addEventListener('click', searchCourse);
-            document.getElementById('courseSearch').addEventListener('keypress', e => { if (e.key === 'Enter') searchCourse(); });
+            document.getElementById('courseSearch').addEventListener('keydown', e => { if (e.key === 'Enter') searchCourse(); });
         }
     </script>
 </body>
