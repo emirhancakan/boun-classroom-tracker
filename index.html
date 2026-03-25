@@ -190,15 +190,6 @@
                 </div>
             </div>
 
-            <!-- Find Button -->
-            <div class="row mb-4">
-                <div class="col-md-4 mx-auto">
-                    <button id="findAvailableBtn" class="btn btn-primary w-100" onclick="findAvailableClassrooms()">
-                        <i class="bi bi-search"></i> Find Available Classrooms
-                    </button>
-                </div>
-            </div>
-
             <!-- Results -->
             <div id="availableResults"></div>
         </div>
@@ -444,7 +435,11 @@
             void activePanel.offsetWidth; // force reflow
             activePanel.classList.add('panel-animate');
 
-            if (mode === 'available') { timeOffset = 0; updateTimeDisplay(); }
+            if (mode === 'available') {
+                timeOffset = 0;
+                updateTimeDisplay();
+                findAvailableClassrooms();
+            }
         }
 
         // =====================================================
@@ -804,6 +799,10 @@
             document.getElementById('semesterSelect').addEventListener('change', () => {
                 const rs = document.getElementById('roomSelect');
                 if (rs && rs.value) loadRoomSchedule(rs.value);
+                if (currentMode === 'available') findAvailableClassrooms();
+            });
+            document.getElementById('availBuildingSelect').addEventListener('change', () => {
+                if (currentMode === 'available') findAvailableClassrooms();
             });
             document.getElementById('searchBtn').addEventListener('click', searchCourse);
             document.getElementById('courseSearch').addEventListener('keypress', e => { if (e.key === 'Enter') searchCourse(); });
