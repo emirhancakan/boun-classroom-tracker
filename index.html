@@ -6,19 +6,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>BOUN Classroom Monitor</title>
 
-    <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
-
-    <!-- Google Fonts - Inter -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-
-    <!-- Custom CSS -->
     <link rel="stylesheet" href="static/styles.css">
 </head>
 
 <body>
-    <!-- Top Bar: Semester + Disclaimer -->
     <div class="top-bar">
         <div class="top-bar-left">
             <label for="semesterSelect"><i class="bi bi-calendar3"></i> Semester</label>
@@ -26,23 +20,18 @@
                 <option value="">Loading...</option>
             </select>
         </div>
-        <div class="disclaimer-badge"
-            title="This tool is not officially affiliated with Boğaziçi University. Schedule data is sourced from the public registration page and may not be fully accurate.">
+        <div class="disclaimer-badge">
             <i class="bi bi-info-circle"></i>
-            <span>Unofficial · Data may be inaccurate</span>
+            <span>Unannounced room reservations may not be reflected here.</span>
         </div>
     </div>
 
-    <!-- Hero -->
     <div class="hero-section">
         <h1>BOUN Classroom Monitor</h1>
-        <span class="version-tag">v0.6.X</span>
     </div>
 
-    <!-- Main Content -->
     <div class="container-fluid px-4 pb-5" style="max-width: 1200px;">
 
-        <!-- Mode Toggle -->
         <div class="row mb-4 mt-4">
             <div class="col-lg-8 mx-auto">
                 <div class="mode-toggle-container">
@@ -57,12 +46,8 @@
             </div>
         </div>
 
-        <!-- ============================================= -->
-        <!-- MODE A: Room Schedule                         -->
-        <!-- ============================================= -->
         <div id="modeSchedulePanel" class="d-none">
 
-            <!-- Building + Room side-by-side -->
             <div class="row mb-4 g-3">
                 <div class="col-md-6">
                     <div class="card h-100">
@@ -90,7 +75,6 @@
                 </div>
             </div>
 
-            <!-- Weekly Schedule Grid -->
             <div id="scheduleGridContainer" class="mb-4 d-none">
                 <div class="card">
                     <div class="card-header"
@@ -117,7 +101,6 @@
                 </div>
             </div>
 
-            <!-- Course Search -->
             <hr class="my-4" style="border-color: var(--border-color);">
 
             <div class="mb-4">
@@ -143,12 +126,8 @@
             <div id="courseResults"></div>
         </div>
 
-        <!-- ============================================= -->
-        <!-- MODE B: Available Classrooms                  -->
-        <!-- ============================================= -->
         <div id="modeAvailablePanel">
 
-            <!-- Building Selection -->
             <div class="row mb-4">
                 <div class="col-md-6 mx-auto">
                     <div class="card">
@@ -164,7 +143,6 @@
                 </div>
             </div>
 
-            <!-- Time Navigation: ← Previous Hour  |  TIME  |  Next Hour → -->
             <div class="row mb-4">
                 <div class="col-md-11 col-lg-10 mx-auto">
                     <div class="card">
@@ -196,12 +174,10 @@
                 </div>
             </div>
 
-            <!-- Results -->
             <div id="availableResults"></div>
         </div>
     </div>
 
-    <!-- Footer -->
     <footer
         style="text-align:center; padding:2.5rem 1rem; margin-top:2rem; border-top:1px solid var(--border-color); color:var(--text-muted); font-size:0.8rem; line-height:1.6;">
         <p style="font-size:1rem; margin-bottom:0.5rem;">🍀 Good luck in the new semester!</p>
@@ -211,16 +187,9 @@
             information presented on this page may sometimes lag behind the registration website.</p>
     </footer>
 
-    <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
     <script>
-        console.log('BOUN Classroom Monitor v0.5');
-
-        // =====================================================
-        // DATA & STATE
-        // =====================================================
-
         const BUILDINGS = [
             { "code": "BM", "name": "Computer Engineering Building", "prefixes": ["BM"] },
             { "code": "BME", "name": "Institute of Biomedical Engineering", "prefixes": ["BME"], "hidden": true },
@@ -241,7 +210,6 @@
             { "code": "VB", "name": "Institute For Data Science And Artificial Intelligence", "prefixes": ["VB"] },
         ];
 
-        // Rooms to exclude from "Available Classrooms" (labs, special rooms)
         const EXCLUDED_ROOMS = new Set(['M 3160', 'M 3160 CAD LAB']);
         const LAB_ROOM_PATTERN = /\bLAB(?:ORATORY)?\b/i;
 
@@ -263,10 +231,6 @@
         let cachedRooms = null;
         let cachedCourses = null;
 
-        // =====================================================
-        // HELPERS
-        // =====================================================
-
         function superNormalizeRoom(room) {
             if (!room) return "";
             return room.replace(/\s/g, '').toUpperCase().trim();
@@ -281,7 +245,7 @@
 
         function isValidRoom(room) {
             if (!room) return false;
-            return /^[A-Za-zİıĞğÜüŞşÖöÇç]+\s*\d+/.test(room.trim());
+            return /^[A-Za-zİıĞğÜüŞşÖöÇç]+\s+[A-Za-z0-9]/.test(room.trim());
         }
 
         function isExcludedFromAvailable(room) {
@@ -314,10 +278,6 @@
             }
             return null;
         }
-
-        // =====================================================
-        // SCHEDULE PARSING
-        // =====================================================
 
         function smartParseSlots(s, target, cur) {
             if (target === 0) return s.length === 0 ? cur : null;
@@ -408,10 +368,6 @@
             return occ;
         }
 
-        // =====================================================
-        // DATA LOADING
-        // =====================================================
-
         async function loadJSON(url) {
             const r = await fetch(url);
             if (!r.ok) throw new Error(`Failed: ${url} (${r.status})`);
@@ -428,10 +384,6 @@
             return cachedRooms;
         }
 
-        // =====================================================
-        // MODE SWITCHING
-        // =====================================================
-
         function switchMode(mode) {
             currentMode = mode;
             document.getElementById('modeSchedule').classList.toggle('active', mode === 'schedule');
@@ -444,10 +396,9 @@
             schedulePanel.classList.toggle('d-none', mode !== 'schedule');
             availablePanel.classList.toggle('d-none', mode !== 'available');
 
-            // Trigger animation on the visible panel
             const activePanel = mode === 'schedule' ? schedulePanel : availablePanel;
             activePanel.classList.remove('panel-animate');
-            void activePanel.offsetWidth; // force reflow
+            void activePanel.offsetWidth;
             activePanel.classList.add('panel-animate');
 
             if (mode === 'available') {
@@ -456,10 +407,6 @@
                 findAvailableClassrooms();
             }
         }
-
-        // =====================================================
-        // INIT
-        // =====================================================
 
         document.addEventListener('DOMContentLoaded', async function () {
             try {
@@ -475,17 +422,12 @@
             currentMode = defaultMode;
             switchMode(defaultMode);
 
-            // Auto-update time every 30 seconds
             setInterval(() => {
                 if (currentMode === 'available') {
                     updateTimeDisplay();
                 }
             }, 30000);
         });
-
-        // =====================================================
-        // SEMESTERS & BUILDINGS
-        // =====================================================
 
         async function loadSemesters() {
             const sel = document.getElementById('semesterSelect');
@@ -519,10 +461,6 @@
             fill('buildingSelect', 'Select a building...');
             fill('availBuildingSelect', 'All Buildings');
         }
-
-        // =====================================================
-        // MODE A: ROOM SCHEDULE
-        // =====================================================
 
         async function onBuildingChange() {
             const code = document.getElementById('buildingSelect').value;
@@ -599,10 +537,6 @@
             }
         }
 
-        // =====================================================
-        // MODE B: AVAILABLE CLASSROOMS
-        // =====================================================
-
         function getCurrentSlotInfo(offset) {
             const now = new Date();
             const hour = now.getHours() + offset;
@@ -678,7 +612,7 @@
             const rd = document.getElementById('availableResults');
 
             if (info.isWeekend) {
-                rd.innerHTML = '<div class="alert alert-info"><i class="bi bi-emoji-sunglasses"></i> It\'s the weekend — all classrooms are available!</div>';
+                rd.innerHTML = '<div class="alert alert-info"><i class="bi bi-emoji-sunglasses"></i> It\'s the weekend — no scheduled classes, but buildings may be locked. Check access before heading over.</div>';
                 return;
             }
             if (!info.isValid) {
@@ -745,10 +679,6 @@
             }
         }
 
-        // =====================================================
-        // COURSE SEARCH
-        // =====================================================
-
         async function searchCourse() {
             const sem = document.getElementById('semesterSelect').value;
             const q = document.getElementById('courseSearch').value.trim();
@@ -804,7 +734,6 @@
             const order = { 'M': 1, 'T': 2, 'W': 3, 'Th': 4, 'F': 5 };
             const slotTypeLabels = { 'LECTURE': 'Lecture', 'LAB': 'Lab', 'PS': 'P.S.' };
 
-            // Flatten each slot entry into individual day-slot-room rows
             const flat = [];
             slots.forEach(s => {
                 const days = parseDayString((s.d || '').trim());
@@ -835,10 +764,6 @@
                     </table>
                 </div>`;
         }
-
-        // =====================================================
-        // EVENT LISTENERS
-        // =====================================================
 
         function attachEventListeners() {
             document.getElementById('buildingSelect').addEventListener('change', onBuildingChange);
