@@ -25,3 +25,6 @@ server_v2.log
 # OS
 .DS_Store
 Thumbs.db
+
+# Local scripts
+run-local.bat
